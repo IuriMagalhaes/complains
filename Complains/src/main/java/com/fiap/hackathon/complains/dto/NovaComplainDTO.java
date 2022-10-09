@@ -4,14 +4,15 @@ import java.util.Date;
 
 public class NovaComplainDTO {
 	
-	private String id;
+	private Long id;
 	private Date dataCriacao;
 	private Date dataAlteracao;
 	private String usuario;
-	public String getId() {
+	
+	public Long getId() {
 		return id;
 	}
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	public Date getDataCriacao() {
@@ -30,6 +31,13 @@ public class NovaComplainDTO {
 		return usuario;
 	}
 	public void setUsuario(String usuario) {
+		this.usuario = usuario;
+	}
+	public NovaComplainDTO(Long id, Date dataCriacao, Date dataAlteracao, String usuario) {
+		super();
+		this.id = id;
+		this.dataCriacao = dataCriacao;
+		this.dataAlteracao = dataAlteracao;
 		this.usuario = usuario;
 	}
 	

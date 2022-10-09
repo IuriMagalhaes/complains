@@ -1,10 +1,11 @@
 amazon:
   acess:
-    key: NUM TEM
-    secret-key: NUM SEI
+    key: AKIATW5KNR2JB33O6RXG
+    secret-key: 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
   region: us-east-1
   end-point:
     url: dynamodb.us-east-1.amazonaws.com
     
 server:
   port: 9001
+  

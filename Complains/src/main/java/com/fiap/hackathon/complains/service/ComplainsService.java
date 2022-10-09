@@ -9,7 +9,7 @@ public interface ComplainsService {
 	
 	List<ComplainsDTO> listarComplains();
 	ComplainsDTO buscarComplainPorId(Long id);
-	void criar(NovaComplainDTO novaComplainDTO);
+	ComplainsDTO criar(NovaComplainDTO novaComplainDTO);
 	ComplainsDTO atualizar(Long id, NovaComplainDTO novaComplainDTO);
 	void deletarComplain(Long id);
 	

@@ -1,8 +1,9 @@
 package com.fiap.hackathon.complains.dto;
 
 import java.util.Date;
+import java.util.Optional;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+import com.fiap.hackathon.complains.entity.Complains;
 
 public class ComplainsDTO {
 	
@@ -11,6 +12,12 @@ public class ComplainsDTO {
 	private Date dataAlteracao;
 	private String usuario;
 	
+	public ComplainsDTO(Optional<Complains> complains) {
+	}
+	
+	public ComplainsDTO(Complains savedComplain) {
+	}
+
 	public String getId() {
 		return id;
 	}

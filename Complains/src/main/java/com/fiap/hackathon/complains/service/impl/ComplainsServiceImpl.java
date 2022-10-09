@@ -1,71 +1,72 @@
 package com.fiap.hackathon.complains.service.impl;
 
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBSaveExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
-import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
 import com.amazonaws.services.dynamodbv2.model.ExpectedAttributeValue;
 import com.fiap.hackathon.complains.dto.ComplainsDTO;
 import com.fiap.hackathon.complains.dto.NovaComplainDTO;
+import com.fiap.hackathon.complains.entity.Complains;
+import com.fiap.hackathon.complains.repository.ComplainsRepository;
 import com.fiap.hackathon.complains.service.ComplainsService;
 
 @Service
 public class ComplainsServiceImpl implements ComplainsService {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(ComplainsServiceImpl.class);
+	private ComplainsRepository complainsRepository;
 	
-	private DynamoDBMapper mapper;
-	
-	public ComplainsServiceImpl(DynamoDBMapper mapper) {
-		this.mapper = mapper;
+	public ComplainsServiceImpl(ComplainsRepository complainsRepository) {
+		this.complainsRepository = complainsRepository;
 	}
 
 	@Override
 	public List<ComplainsDTO> listarComplains() {
-		return null;
+		List<Complains> complainsList;
+		complainsList = complainsRepository.findAll();
+		return complainsList
+				.stream()
+				.map(ComplainsDTO::new)
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public ComplainsDTO buscarComplainPorId(Long id) {
-		return mapper.load(ComplainsDTO.class, id);
+		Optional<Complains> complains = complainsRepository.findById(id);
+		return new ComplainsDTO(complains);
 	}
 
 	@Override
-	public void criar(NovaComplainDTO novaComplainDTO) {
-		mapper.save(novaComplainDTO);
+	public ComplainsDTO criar(NovaComplainDTO novaComplainDTO) {
+		Complains complains = new Complains(novaComplainDTO);
+		Complains savedComplain = complainsRepository.save(complains);
+		return new ComplainsDTO(savedComplain);
 	}
 
 	@Override
 	public ComplainsDTO atualizar(Long id, NovaComplainDTO novaComplainDTO) {
-		try {
-			mapper.save(novaComplainDTO, buildDynamoDBSaveExpression(novaComplainDTO));
-		} catch (ConditionalCheckFailedException exception) {
-			LOGGER.error("dado invalido - " + exception.getMessage());
-		}
-		return null;
+		Optional<Complains> complains = complainsRepository.findById(id); 
+		complains.orElseThrow().setId(novaComplainDTO.getId());
+		complains.orElseThrow().setDataAlteracao(GregorianCalendar.getInstance().getTime());
+		complains.orElseThrow().setUsuario(novaComplainDTO.getUsuario());
+		
+		Complains updatedComplain = complainsRepository.save(complains.get());
+		return new ComplainsDTO(updatedComplain);
 	}
 
 	@Override
 	public void deletarComplain(Long id) {
-		mapper.delete(id);
+		complainsRepository.deleteById(id);
 	}
 	
-	private DynamoDBSaveExpression buildDynamoDBSaveExpression(NovaComplainDTO novaComplainDTO) {
-		DynamoDBSaveExpression saveExpression = new DynamoDBSaveExpression();
-		Map<String, ExpectedAttributeValue> expected = new HashMap<>();
-		expected.put("Id", new ExpectedAttributeValue(new AttributeValue(novaComplainDTO.getId()))
-				.withComparisonOperator(ComparisonOperator.EQ));
-		saveExpression.setExpected(expected);
-		return saveExpression;
-	}
-
 }

@@ -20,7 +20,7 @@ public class DynamoDbConfig {
 	@Value("${amazon.acess.secret-key}")
 	private String awsSecretKey;
 	
-	@Value("${amazon.acess.region}")
+	@Value("${amazon.region}")
 	private String awsRegion;
 	
 	@Value("${amazon.end-point.url}")	
