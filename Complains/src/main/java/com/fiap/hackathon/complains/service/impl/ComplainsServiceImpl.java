@@ -33,7 +33,7 @@ public class ComplainsServiceImpl implements ComplainsService {
 	@Override
 	public List<ComplainsDTO> listarComplains() {
 		List<Complains> complainsList;
-		complainsList = complainsRepository.findAll();
+		complainsList = (List<Complains>) complainsRepository.findAll();
 		return complainsList
 				.stream()
 				.map(ComplainsDTO::new)
