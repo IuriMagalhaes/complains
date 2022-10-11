@@ -1,8 +1,12 @@
 package com.fiap.hackathon;
 
-import java.util.GregorianCalendar;
-import java.util.List;
-
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
+import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
+import com.fiap.hackathon.complains.ComplainsApplication;
+import com.fiap.hackathon.complains.entity.Complains;
+import com.fiap.hackathon.complains.repository.ComplainsRepository;
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -13,14 +17,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
-import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
-import com.fiap.hackathon.complains.ComplainsApplication;
-import com.fiap.hackathon.complains.dto.ComplainsDTO;
-import com.fiap.hackathon.complains.entity.Complains;
-import com.fiap.hackathon.complains.repository.ComplainsRepository;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = ComplainsApplication.class)
@@ -60,7 +58,7 @@ public class DynamoDBTest {
 
     @Test
     public void givenItemWithExpectedCost_whenRunFindAll_thenItemIsFound() { 
-    	Complains novaReclamacao = new Complains(1L, GregorianCalendar.getInstance().getTime(), GregorianCalendar.getInstance().getTime(), "Teste");
+    	Complains novaReclamacao = new Complains("adasdas-asdasd-asdasd-asdas", GregorianCalendar.getInstance().getTime(), GregorianCalendar.getInstance().getTime(), "Teste");
         repository.save(novaReclamacao); 
         List<Complains> result = (List<Complains>) repository.findAll();
 

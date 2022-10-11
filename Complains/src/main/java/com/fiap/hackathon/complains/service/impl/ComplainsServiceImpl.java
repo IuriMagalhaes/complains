@@ -1,10 +1,6 @@
 package com.fiap.hackathon.complains.service.impl;
 
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -41,7 +37,7 @@ public class ComplainsServiceImpl implements ComplainsService {
 	}
 
 	@Override
-	public ComplainsDTO buscarComplainPorId(Long id) {
+	public ComplainsDTO buscarComplainPorId(String id) {
 		Optional<Complains> complains = complainsRepository.findById(id);
 		return new ComplainsDTO(complains);
 	}
@@ -49,12 +45,12 @@ public class ComplainsServiceImpl implements ComplainsService {
 	@Override
 	public ComplainsDTO criar(NovaComplainDTO novaComplainDTO) {
 		Complains complains = new Complains(novaComplainDTO);
-		Complains savedComplain = complainsRepository.save(complains);
+		Complains savedComplain = complainsRepository.save(new Complains(null, new Date(),new Date(),"usuário joao"));
 		return new ComplainsDTO(savedComplain);
 	}
 
 	@Override
-	public ComplainsDTO atualizar(Long id, NovaComplainDTO novaComplainDTO) {
+	public ComplainsDTO atualizar(String id, NovaComplainDTO novaComplainDTO) {
 		Optional<Complains> complains = complainsRepository.findById(id); 
 		complains.orElseThrow().setId(novaComplainDTO.getId());
 		complains.orElseThrow().setDataAlteracao(GregorianCalendar.getInstance().getTime());
@@ -65,7 +61,7 @@ public class ComplainsServiceImpl implements ComplainsService {
 	}
 
 	@Override
-	public void deletarComplain(Long id) {
+	public void deletarComplain(String id) {
 		complainsRepository.deleteById(id);
 	}
 	

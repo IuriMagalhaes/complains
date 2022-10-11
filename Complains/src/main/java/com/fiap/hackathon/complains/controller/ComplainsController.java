@@ -32,8 +32,8 @@ public class ComplainsController {
 		return complainsService.listarComplains();
 	}
 
-	@GetMapping("{id}")
-	public ComplainsDTO getComplainsByUd(@PathVariable(name = "id") Long id) {
+	@GetMapping("/{id}")
+	public ComplainsDTO getComplainsByUd(@PathVariable(name = "id") String id) {
 		return complainsService.buscarComplainPorId(id);
 	}
 
@@ -43,14 +43,14 @@ public class ComplainsController {
 		complainsService.criar(newComplainDTO);
 	}
 
-	@PutMapping("{id}")
-	public ComplainsDTO updateComplain(@RequestBody NovaComplainDTO novaComplainDTO, @PathVariable Long id) {
+	@PutMapping("/{id}")
+	public ComplainsDTO updateComplain(@RequestBody NovaComplainDTO novaComplainDTO, @PathVariable String id) {
 		return complainsService.atualizar(id, novaComplainDTO);
 	}
 
-	@DeleteMapping("{id}")
+	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void deleteComplain(@PathVariable Long id) {
+	public void deleteComplain(@PathVariable String id) {
 		complainsService.deletarComplain(id);
 	}
 

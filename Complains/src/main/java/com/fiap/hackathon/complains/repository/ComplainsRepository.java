@@ -7,9 +7,10 @@ import org.socialsignin.spring.data.dynamodb.repository.EnableScan;
 import org.springframework.data.repository.CrudRepository;
 
 import com.fiap.hackathon.complains.entity.Complains;
+import org.springframework.stereotype.Repository;
 
-@EnableScan	
-public interface ComplainsRepository extends CrudRepository<Complains, Long>{
-	Optional<Complains> findById(String id);
-	Optional<List<Complains>> findAllOptional();
+@Repository
+@EnableScan
+public interface ComplainsRepository extends CrudRepository<Complains, String> {
+    Optional<Complains> findById(String id);
 }

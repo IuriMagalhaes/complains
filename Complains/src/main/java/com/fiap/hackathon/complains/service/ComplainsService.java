@@ -8,9 +8,9 @@ import com.fiap.hackathon.complains.dto.NovaComplainDTO;
 public interface ComplainsService {
 	
 	List<ComplainsDTO> listarComplains();
-	ComplainsDTO buscarComplainPorId(Long id);
+	ComplainsDTO buscarComplainPorId(String id);
 	ComplainsDTO criar(NovaComplainDTO novaComplainDTO);
-	ComplainsDTO atualizar(Long id, NovaComplainDTO novaComplainDTO);
-	void deletarComplain(Long id);
+	ComplainsDTO atualizar(String id, NovaComplainDTO novaComplainDTO);
+	void deletarComplain(String id);
 	
 }
