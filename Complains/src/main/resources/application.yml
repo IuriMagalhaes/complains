@@ -8,9 +8,11 @@ amazon:
   region: us-east-1
 
   queue:
-    complains: https://sqs.us-east-1.amazonaws.com/255371087506/complains
-    attendance: https://sqs.us-east-1.amazonaws.com/255371087506/attedence
+    complains: complains
+    attendance: attedence
     
 server:
   port: 9001
-  
+  error:
+    include-message: always
+    include-binding-errors: always

@@ -2,8 +2,8 @@ package com.fiap.hackathon.complains.service;
 
 import java.util.List;
 
-import com.fiap.hackathon.complains.dto.ComplainsDTO;
-import com.fiap.hackathon.complains.dto.NovaComplainDTO;
+import com.fiap.hackathon.complains.model.dto.ComplainsDTO;
+import com.fiap.hackathon.complains.model.dto.NovaComplainDTO;
 
 public interface ComplainsService {
 	

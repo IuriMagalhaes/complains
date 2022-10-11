@@ -9,22 +9,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-
-/**
- * SQS Consumer
- * p66-gateway-create-bpp-account
- */
 @Component
 @Slf4j
 public class ComplainsMessageConsumer {
 
-
-    @Value("attedence")
-    private String queueName;
-
-
-   @JmsListener(destination = "attedence")
+    @JmsListener(destination = "${amazon.queue.attendance}")
     public void messageConsumer(@Headers Map<String, Object> messageAttributes, @Payload String message) {
-    log.info(message);
+        log.info(message);
     }
 }
