@@ -4,6 +4,12 @@ amazon:
     secretkey: ONi6y8P2S0RPKVRiLZhJ9UWCJ5uG+CQuqHOSsyyO
   dynamodb:
     endpoint: http://dynamodb.us-east-1.amazonaws.com
+
+  region: us-east-1
+
+  queue:
+    complains: https://sqs.us-east-1.amazonaws.com/255371087506/complains
+    attendance: https://sqs.us-east-1.amazonaws.com/255371087506/attedence
     
 server:
   port: 9001

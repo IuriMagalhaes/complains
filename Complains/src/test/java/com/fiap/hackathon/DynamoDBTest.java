@@ -31,6 +31,7 @@ import java.util.List;
 
 public class DynamoDBTest {
 
+    /*
     private DynamoDBMapper dynamoDBMapper;
 
     @Autowired
@@ -62,6 +63,6 @@ public class DynamoDBTest {
         repository.save(novaReclamacao); 
         List<Complains> result = (List<Complains>) repository.findAll();
 
-    }
+    }*/
 
 }
