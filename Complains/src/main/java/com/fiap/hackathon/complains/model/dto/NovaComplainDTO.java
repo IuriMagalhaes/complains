@@ -14,8 +14,8 @@ import java.util.UUID;
 @Builder
 public class NovaComplainDTO {
 
-    private String id;
     private Date dataCriacao;
     private Date dataAlteracao;
     private String usuario;
+    private String reclamacao;
 }

@@ -27,21 +27,4 @@ public class MessageServiceProducer {
                 );
     }
 
-    public void sentToQueueWithHeader(final String queueName, final String message, final Map<String, String> header) {
-        final Map<String, MessageAttributeValue> messageHeader = new HashMap<>();
-        header.forEach((key, value) -> messageHeader.put(key, new MessageAttributeValue().withDataType("String").withStringValue(value)));
-        amazonSQS.sendMessage(new SendMessageRequest()
-                .withQueueUrl(queueName)
-                .withMessageBody(message)
-                .withMessageAttributes(messageHeader));
-    }
-
-
-    public void sentToQueueWithDelay(final String queueName, final String message, final Integer delaySeconds) {
-        amazonSQS.sendMessage(new SendMessageRequest()
-                .withQueueUrl(queueName)
-                .withMessageBody(message)
-                .withDelaySeconds(delaySeconds));
-    }
-
 }

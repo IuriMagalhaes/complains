@@ -5,7 +5,11 @@ import java.util.stream.Collectors;
 
 import com.fiap.hackathon.complains.exception.ResourceNotFoundException;
 import com.fiap.hackathon.complains.helper.ComplainsHelper;
+import com.fiap.hackathon.complains.sqs.MessageServiceProducer;
+import com.fiap.hackathon.complains.util.JsonUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -21,13 +25,20 @@ import static com.fiap.hackathon.complains.helper.ComplainsHelper.complainsUpdat
 import static com.fiap.hackathon.complains.helper.ComplainsHelper.createComplainsBuilder;
 
 @Service
+@Slf4j
 public class ComplainsServiceImpl implements ComplainsService {
 	
 	private ComplainsRepository complainsRepository;
 
+	private MessageServiceProducer messageServiceProducer;
+
+	@Value("${amazon.queue.complains}")
+	private String queueName;
+
 	@Autowired
-	public ComplainsServiceImpl(ComplainsRepository complainsRepository) {
+	public ComplainsServiceImpl(ComplainsRepository complainsRepository, MessageServiceProducer messageServiceProducer) {
 		this.complainsRepository = complainsRepository;
+		this.messageServiceProducer = messageServiceProducer;
 	}
 
 	@Override
@@ -49,6 +60,11 @@ public class ComplainsServiceImpl implements ComplainsService {
 	@Override
 	public ComplainsDTO criar(NovaComplainDTO novaComplainDTO) {
 		Complains savedComplain = complainsRepository.save(createComplainsBuilder(novaComplainDTO));
+
+		messageServiceProducer.sentToQueue(queueName, JsonUtil.writeValueAsString(savedComplain));
+		log.info("***** COMPLAIN CREATED AND MESSAGE SENT TO QUEUE:  " + queueName + ", COMPLAIN USER: " + novaComplainDTO.getUsuario()
+				+ ", COMPLAIN ID: " + savedComplain.getId());
+
 		return complainsDTOBuilder(savedComplain);
 	}
 
@@ -57,6 +73,11 @@ public class ComplainsServiceImpl implements ComplainsService {
 		Complains complains = complainsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(HttpStatus.NOT_FOUND, "Id Not found!"));
 		Complains complainsUpdated = complainsUpdateBuilder(complains, novaComplainDTO);
 		Complains updatedComplain = complainsRepository.save(complainsUpdated);
+
+		messageServiceProducer.sentToQueue(queueName, JsonUtil.writeValueAsString(updatedComplain));
+		log.info("***** COMPLAIN CREATED AND MESSAGE SENT TO QUEUE:  " + queueName + ", COMPLAIN USER: " + novaComplainDTO.getUsuario()
+				+ ", COMPLAIN ID: " + updatedComplain.getId());
+
 		return complainsDTOBuilder(updatedComplain);
 	}
 

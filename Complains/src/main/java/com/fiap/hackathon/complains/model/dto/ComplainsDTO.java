@@ -19,5 +19,6 @@ public class ComplainsDTO {
 	private Date dataCriacao;
 	private Date dataAlteracao;
 	private String usuario;
+	private String reclamacao;
 
 }

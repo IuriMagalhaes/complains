@@ -43,9 +43,9 @@ public class ComplainsController {
     }
 
     @PostMapping(value = "/createComplain")
-    public ResponseEntity<Void> createComplain(@RequestBody NovaComplainDTO newComplainDTO) {
-        complainsService.criar(newComplainDTO);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<ComplainsDTO> createComplain(@RequestBody NovaComplainDTO newComplainDTO) {
+        ComplainsDTO complainsDTO = complainsService.criar(newComplainDTO);
+        return new ResponseEntity<>(complainsDTO, HttpStatus.CREATED);
     }
 
     @PutMapping("/updateComplain/{id}")
