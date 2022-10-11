@@ -1,7 +1,7 @@
 amazon:
   aws:
-    accesskey: AKIATW5KNR2JB33O6RXG
-    secretkey: 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
+    accesskey: ${acess.key}
+    secretkey: ${secret.key}
   dynamodb:
     endpoint: http://dynamodb.us-east-1.amazonaws.com
 
