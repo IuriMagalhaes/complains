@@ -20,6 +20,7 @@ import com.fiap.hackathon.complains.repository.ComplainsRepository;
 import com.fiap.hackathon.complains.service.ComplainsService;
 import org.springframework.web.client.HttpClientErrorException;
 
+import static com.fiap.hackathon.complains.helper.ComplainsHelper.closeComplainsBuilder;
 import static com.fiap.hackathon.complains.helper.ComplainsHelper.complainsDTOBuilder;
 import static com.fiap.hackathon.complains.helper.ComplainsHelper.complainsUpdateBuilder;
 import static com.fiap.hackathon.complains.helper.ComplainsHelper.createComplainsBuilder;
@@ -27,69 +28,80 @@ import static com.fiap.hackathon.complains.helper.ComplainsHelper.createComplain
 @Service
 @Slf4j
 public class ComplainsServiceImpl implements ComplainsService {
-	
-	private ComplainsRepository complainsRepository;
 
-	private MessageServiceProducer messageServiceProducer;
+    private ComplainsRepository complainsRepository;
 
-	@Value("${amazon.queue.complains}")
-	private String queueName;
+    private MessageServiceProducer messageServiceProducer;
 
-	@Autowired
-	public ComplainsServiceImpl(ComplainsRepository complainsRepository, MessageServiceProducer messageServiceProducer) {
-		this.complainsRepository = complainsRepository;
-		this.messageServiceProducer = messageServiceProducer;
-	}
+    @Value("${amazon.queue.complains}")
+    private String queueName;
 
-	@Override
-	public List<ComplainsDTO> listarComplains() {
-		List<Complains> complainsList;
-		complainsList = (List<Complains>) complainsRepository.findAll();
-		return complainsList
-				.stream()
-				.map(ComplainsHelper::complainsDTOBuilder)
-				.collect(Collectors.toList());
-	}
+    @Autowired
+    public ComplainsServiceImpl(ComplainsRepository complainsRepository, MessageServiceProducer messageServiceProducer) {
+        this.complainsRepository = complainsRepository;
+        this.messageServiceProducer = messageServiceProducer;
+    }
 
-	@Override
-	public ComplainsDTO buscarComplainPorId(String id) {
-		Complains complains = complainsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(HttpStatus.NOT_FOUND, "Id Not found!"));
-		return complainsDTOBuilder(complains);
-	}
+    @Override
+    public List<ComplainsDTO> listarComplains() {
+        List<Complains> complainsList;
+        complainsList = (List<Complains>) complainsRepository.findAll();
+        return complainsList
+                .stream()
+                .map(ComplainsHelper::complainsDTOBuilder)
+                .collect(Collectors.toList());
+    }
 
-	@Override
-	public ComplainsDTO criar(NovaComplainDTO novaComplainDTO) {
-		Complains savedComplain = complainsRepository.save(createComplainsBuilder(novaComplainDTO));
+    @Override
+    public ComplainsDTO buscarComplainPorId(String id) {
+        Complains complains = complainsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(HttpStatus.NOT_FOUND, "Id Not found!"));
+        return complainsDTOBuilder(complains);
+    }
 
-		messageServiceProducer.sentToQueue(queueName, JsonUtil.writeValueAsString(savedComplain));
-		log.info("***** COMPLAIN CREATED AND MESSAGE SENT TO QUEUE:  " + queueName + ", COMPLAIN USER: " + novaComplainDTO.getUsuario()
-				+ ", COMPLAIN ID: " + savedComplain.getId());
+    @Override
+    public ComplainsDTO criar(NovaComplainDTO novaComplainDTO) {
+        Complains savedComplain = complainsRepository.save(createComplainsBuilder(novaComplainDTO));
 
-		return complainsDTOBuilder(savedComplain);
-	}
+        messageServiceProducer.sentToQueue(queueName, JsonUtil.writeValueAsString(savedComplain));
+        log.info("***** COMPLAIN CREATED AND MESSAGE SENT TO QUEUE:  " + queueName + ", COMPLAIN USER: " + novaComplainDTO.getUsuario()
+                + ", COMPLAIN ID: " + savedComplain.getId());
 
-	@Override
-	public ComplainsDTO atualizar(String id, NovaComplainDTO novaComplainDTO) {
-		Complains complains = complainsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(HttpStatus.NOT_FOUND, "Id Not found!"));
-		Complains complainsUpdated = complainsUpdateBuilder(complains, novaComplainDTO);
-		Complains updatedComplain = complainsRepository.save(complainsUpdated);
+        return complainsDTOBuilder(savedComplain);
+    }
 
-		messageServiceProducer.sentToQueue(queueName, JsonUtil.writeValueAsString(updatedComplain));
-		log.info("***** COMPLAIN CREATED AND MESSAGE SENT TO QUEUE:  " + queueName + ", COMPLAIN USER: " + novaComplainDTO.getUsuario()
-				+ ", COMPLAIN ID: " + updatedComplain.getId());
+    @Override
+    public ComplainsDTO atualizar(String id, NovaComplainDTO novaComplainDTO) {
+        Complains complains = complainsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(HttpStatus.NOT_FOUND, "Id Not found!"));
+        Complains complainsUpdated = complainsUpdateBuilder(complains, novaComplainDTO);
+        Complains updatedComplain = complainsRepository.save(complainsUpdated);
 
-		return complainsDTOBuilder(updatedComplain);
-	}
+        messageServiceProducer.sentToQueue(queueName, JsonUtil.writeValueAsString(updatedComplain));
+        log.info("***** COMPLAIN CREATED AND MESSAGE SENT TO QUEUE:  " + queueName + ", COMPLAIN USER: " + novaComplainDTO.getUsuario()
+                + ", COMPLAIN ID: " + updatedComplain.getId());
 
-	@Override
-	public void deletarComplain(String id) {
-		Complains complains = complainsRepository.findById(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Id Not found!"));
+        return complainsDTOBuilder(updatedComplain);
+    }
 
-		if(Objects.isNull(complains)){
-			throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Id Not found!");
-		}
+    @Override
+    public void deletarComplain(String id) {
+        Complains complains = complainsRepository.findById(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Id Not found!"));
 
-		complainsRepository.deleteById(id);
-	}
-	
+        if (Objects.isNull(complains)) {
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Id Not found!");
+        }
+
+        complainsRepository.deleteById(id);
+    }
+
+    @Override
+    public void fecharComplain(ComplainsDTO complainsDTO) {
+        if(Objects.isNull(complainsDTO)){
+            throw new RuntimeException("Object is null!");
+        }
+
+        log.info("**** COMPLAIM UPDATED AND CLOSED!!! ****");
+
+        complainsRepository.save(closeComplainsBuilder(complainsDTO));
+    }
+
 }

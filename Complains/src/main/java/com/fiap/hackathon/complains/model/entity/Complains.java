@@ -38,5 +38,8 @@ public class Complains implements Serializable{
 	@DynamoDBAttribute
 	private String reclamacao;
 
+	@DynamoDBAttribute
+	private String status;
+
 
 }

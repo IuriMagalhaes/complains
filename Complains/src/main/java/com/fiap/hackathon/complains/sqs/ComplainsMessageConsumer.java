@@ -1,8 +1,10 @@
 package com.fiap.hackathon.complains.sqs;
 
 import com.fiap.hackathon.complains.model.dto.ComplainsDTO;
+import com.fiap.hackathon.complains.service.ComplainsService;
 import com.fiap.hackathon.complains.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.messaging.handler.annotation.Headers;
@@ -15,6 +17,14 @@ import java.util.Map;
 @Slf4j
 public class ComplainsMessageConsumer {
 
+
+    private ComplainsService complainsService;
+
+    @Autowired
+    public ComplainsMessageConsumer(ComplainsService complainsService) {
+        this.complainsService = complainsService;
+    }
+
     @Value("${amazon.queue.attendance}")
     private String queueName;
 
@@ -25,7 +35,7 @@ public class ComplainsMessageConsumer {
         log.info("***** COMPLAIN UPDATED RECEIVED AFTER ATTENDANCE:  " + queueName + ", COMPLAIN USER: " + complainsDTO.getUsuario()
                 + ", COMPLAIN ID: " + complainsDTO.getId());
 
-        //chama service
+        complainsService.fecharComplain(complainsDTO);
     }
 
 }
