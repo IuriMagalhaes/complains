@@ -47,10 +47,17 @@ public class ComplainsController {
 
     @PostMapping(value = "/createComplain", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<ComplainsDTO> createComplain(@RequestPart("evidencia") MultipartFile document, @RequestPart("body") NovaComplainDTO newComplainDTO) throws IOException {
-        ComplainsDTO complainsDTO = complainsService.criar(document, newComplainDTO);
+        ComplainsDTO complainsDTO = complainsService.criarComEvidencia(document, newComplainDTO);
 
         return new ResponseEntity<>(complainsDTO, HttpStatus.CREATED);
     }
+    
+    @PostMapping(value = "/createComplain")
+    public ResponseEntity<ComplainsDTO> createComplain(@RequestBody NovaComplainDTO newComplainDTO) {
+        ComplainsDTO complainsDTO = complainsService.criar(newComplainDTO);
+        return new ResponseEntity<>(complainsDTO, HttpStatus.CREATED);
+    }
+
 
     @PutMapping("/updateComplain/{id}")
     public ResponseEntity<ComplainsDTO> updateComplain(@RequestBody NovaComplainDTO novaComplainDTO, @PathVariable String id) {

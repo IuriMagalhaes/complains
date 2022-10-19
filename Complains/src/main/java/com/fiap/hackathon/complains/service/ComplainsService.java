@@ -12,7 +12,9 @@ public interface ComplainsService {
 
 	ComplainsDTO buscarComplainPorId(String id);
 
-	ComplainsDTO criar(MultipartFile evidencia, NovaComplainDTO novaComplainDTO);
+	ComplainsDTO criarComEvidencia(MultipartFile evidencia, NovaComplainDTO novaComplainDTO);
+	
+	ComplainsDTO criar(NovaComplainDTO novaComplainDTO);
 
 	ComplainsDTO atualizar(String id, NovaComplainDTO novaComplainDTO);
 
