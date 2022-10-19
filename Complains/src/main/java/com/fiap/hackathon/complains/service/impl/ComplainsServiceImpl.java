@@ -1,13 +1,18 @@
 package com.fiap.hackathon.complains.service.impl;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.PutObjectResult;
 import com.fiap.hackathon.complains.exception.ResourceNotFoundException;
 import com.fiap.hackathon.complains.helper.ComplainsHelper;
 import com.fiap.hackathon.complains.sqs.MessageServiceProducer;
 import com.fiap.hackathon.complains.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -19,6 +24,7 @@ import com.fiap.hackathon.complains.model.entity.Complains;
 import com.fiap.hackathon.complains.repository.ComplainsRepository;
 import com.fiap.hackathon.complains.service.ComplainsService;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.multipart.MultipartFile;
 
 import static com.fiap.hackathon.complains.helper.ComplainsHelper.closeComplainsBuilder;
 import static com.fiap.hackathon.complains.helper.ComplainsHelper.complainsDTOBuilder;
@@ -30,16 +36,16 @@ import static com.fiap.hackathon.complains.helper.ComplainsHelper.createComplain
 public class ComplainsServiceImpl implements ComplainsService {
 
     private ComplainsRepository complainsRepository;
-
     private MessageServiceProducer messageServiceProducer;
-
-    @Value("${amazon.queue.complains}")
+    private AmazonS3 amazonS3;
     private String queueName;
 
     @Autowired
-    public ComplainsServiceImpl(ComplainsRepository complainsRepository, MessageServiceProducer messageServiceProducer) {
+    public ComplainsServiceImpl(ComplainsRepository complainsRepository, MessageServiceProducer messageServiceProducer, AmazonS3 amazonS3, @Value("${amazon.queue.complains}") String queueName) {
         this.complainsRepository = complainsRepository;
         this.messageServiceProducer = messageServiceProducer;
+        this.amazonS3 = amazonS3;
+        this.queueName = queueName;
     }
 
     @Override
@@ -59,10 +65,12 @@ public class ComplainsServiceImpl implements ComplainsService {
     }
 
     @Override
-    public ComplainsDTO criar(NovaComplainDTO novaComplainDTO) {
+    public ComplainsDTO criar(MultipartFile evidencia, NovaComplainDTO novaComplainDTO) {
         Complains savedComplain = complainsRepository.save(createComplainsBuilder(novaComplainDTO));
 
+        PutObjectResult putObjectResult = amazonS3.putObject("complain-document", evidencia.getOriginalFilename(), convertMultiPartFileToFile(evidencia));
         messageServiceProducer.sentToQueue(queueName, JsonUtil.writeValueAsString(savedComplain));
+
         log.info("***** COMPLAIN CREATED AND MESSAGE SENT TO QUEUE:  " + queueName + ", COMPLAIN USER: " + novaComplainDTO.getUsuario()
                 + ", COMPLAIN ID: " + savedComplain.getId());
 
@@ -95,7 +103,7 @@ public class ComplainsServiceImpl implements ComplainsService {
 
     @Override
     public void fecharComplain(ComplainsDTO complainsDTO) {
-        if(Objects.isNull(complainsDTO)){
+        if (Objects.isNull(complainsDTO)) {
             throw new RuntimeException("Object is null!");
         }
 
@@ -104,4 +112,14 @@ public class ComplainsServiceImpl implements ComplainsService {
         complainsRepository.save(closeComplainsBuilder(complainsDTO));
     }
 
+    private File convertMultiPartFileToFile(MultipartFile file){
+        var newFile = new File(file.getOriginalFilename());
+
+        try {
+            FileUtils.writeByteArrayToFile(newFile, file.getBytes());
+            return newFile;
+        } catch (IOException ex) {
+            throw new RuntimeException("erro escrevendo no arquivo");
+        }
+    }
 }

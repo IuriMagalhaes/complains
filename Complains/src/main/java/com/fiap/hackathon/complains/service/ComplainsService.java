@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fiap.hackathon.complains.model.dto.ComplainsDTO;
 import com.fiap.hackathon.complains.model.dto.NovaComplainDTO;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface ComplainsService {
 	
@@ -11,7 +12,7 @@ public interface ComplainsService {
 
 	ComplainsDTO buscarComplainPorId(String id);
 
-	ComplainsDTO criar(NovaComplainDTO novaComplainDTO);
+	ComplainsDTO criar(MultipartFile evidencia, NovaComplainDTO novaComplainDTO);
 
 	ComplainsDTO atualizar(String id, NovaComplainDTO novaComplainDTO);
 
