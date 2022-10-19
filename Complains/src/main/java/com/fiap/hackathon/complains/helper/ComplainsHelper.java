@@ -1,6 +1,6 @@
 package com.fiap.hackathon.complains.helper;
 
-import com.fiap.hackathon.complains.enuns.ComplainsEnum;
+import com.fiap.hackathon.complains.enuns.StatusComplainEnum;
 import com.fiap.hackathon.complains.model.dto.ComplainsDTO;
 import com.fiap.hackathon.complains.model.dto.NovaComplainDTO;
 import com.fiap.hackathon.complains.model.entity.Complains;
@@ -12,8 +12,9 @@ public class ComplainsHelper {
                 .usuario(novacomplainDTO.getUsuario())
                 .dataCriacao(novacomplainDTO.getDataCriacao())
                 .dataAlteracao(novacomplainDTO.getDataAlteracao())
-                .reclamacao(novacomplainDTO.getReclamacao())
-                .status(ComplainsEnum.ABERTO.name())
+                .descricaoReclamacao(novacomplainDTO.getDescricaoReclamacao())
+                .status(StatusComplainEnum.ABERTO)
+                .tipoReclamacao(novacomplainDTO.getTipoReclamacao())
                 .build();
     }
 
@@ -23,8 +24,9 @@ public class ComplainsHelper {
                 .usuario(complains.getUsuario())
                 .dataCriacao(complains.getDataCriacao())
                 .dataAlteracao(complains.getDataAlteracao())
-                .reclamacao(complains.getReclamacao())
+                .descricaoReclamacao(complains.getDescricaoReclamacao())
                 .status(complains.getStatus())
+                .tipoReclamacao(complains.getTipoReclamacao())
                 .build();
     }
 
@@ -34,8 +36,9 @@ public class ComplainsHelper {
                 .usuario(novacomplainDTO.getUsuario())
                 .dataCriacao(novacomplainDTO.getDataCriacao())
                 .dataAlteracao(novacomplainDTO.getDataAlteracao())
-                .reclamacao(novacomplainDTO.getReclamacao())
+                .descricaoReclamacao(novacomplainDTO.getDescricaoReclamacao())
                 .status(complains.getStatus())
+                .tipoReclamacao(complains.getTipoReclamacao())
                 .build();
     }
 
@@ -45,8 +48,9 @@ public class ComplainsHelper {
                 .usuario(complainsDTO.getUsuario())
                 .dataCriacao(complainsDTO.getDataCriacao())
                 .dataAlteracao(complainsDTO.getDataAlteracao())
-                .reclamacao(complainsDTO.getReclamacao())
+                .descricaoReclamacao(complainsDTO.getDescricaoReclamacao())
                 .status(complainsDTO.getStatus())
+                .tipoReclamacao(complainsDTO.getTipoReclamacao())
                 .build();
     }
 

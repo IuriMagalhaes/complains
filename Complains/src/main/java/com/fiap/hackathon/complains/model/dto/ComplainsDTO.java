@@ -1,9 +1,10 @@
 package com.fiap.hackathon.complains.model.dto;
 
 import java.util.Date;
-import java.util.Optional;
 
-import com.fiap.hackathon.complains.model.entity.Complains;
+import com.fiap.hackathon.complains.enuns.StatusComplainEnum;
+import com.fiap.hackathon.complains.enuns.TipoComplainEnum;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +20,8 @@ public class ComplainsDTO {
 	private Date dataCriacao;
 	private Date dataAlteracao;
 	private String usuario;
-	private String reclamacao;
-	private String status;
+	private String descricaoReclamacao;
+	private StatusComplainEnum status;
+	private TipoComplainEnum tipoReclamacao;
 
 }
