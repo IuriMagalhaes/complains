@@ -68,8 +68,10 @@ public class ComplainsServiceImpl implements ComplainsService {
     public ComplainsDTO criar(MultipartFile evidencia, NovaComplainDTO novaComplainDTO) {
         Complains savedComplain = complainsRepository.save(createComplainsBuilder(novaComplainDTO));
 
-        PutObjectResult putObjectResult = amazonS3.putObject("complain-document", evidencia.getOriginalFilename(), convertMultiPartFileToFile(evidencia));
+
+        enviarEvidenciaParaOS3(evidencia);
         messageServiceProducer.sentToQueue(queueName, JsonUtil.writeValueAsString(savedComplain));
+
 
         log.info("***** COMPLAIN CREATED AND MESSAGE SENT TO QUEUE:  " + queueName + ", COMPLAIN USER: " + novaComplainDTO.getUsuario()
                 + ", COMPLAIN ID: " + savedComplain.getId());
@@ -112,7 +114,15 @@ public class ComplainsServiceImpl implements ComplainsService {
         complainsRepository.save(closeComplainsBuilder(complainsDTO));
     }
 
-    private File convertMultiPartFileToFile(MultipartFile file){
+    private void enviarEvidenciaParaOS3(MultipartFile file) {
+        var evidencia = convertMultiPartFileToFile(file);
+
+        amazonS3.putObject("complain-document", evidencia.getName(), evidencia);
+
+        evidencia.delete();
+    }
+
+    private File convertMultiPartFileToFile(MultipartFile file) {
         var newFile = new File(file.getOriginalFilename());
 
         try {
