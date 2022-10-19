@@ -1,23 +1,22 @@
 package com.fiap.hackathon.complains.controller;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
+import com.amazonaws.services.s3.AmazonS3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.fiap.hackathon.complains.model.dto.ComplainsDTO;
 import com.fiap.hackathon.complains.model.dto.NovaComplainDTO;
 import com.fiap.hackathon.complains.service.ComplainsService;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/complains")
@@ -25,10 +24,14 @@ public class ComplainsController {
 
     private ComplainsService complainsService;
 
+    private AmazonS3 amazonS3;
+
     @Autowired
-    public ComplainsController(ComplainsService complainsService) {
+    public ComplainsController(ComplainsService complainsService, AmazonS3 amazonS3) {
         this.complainsService = complainsService;
+        this.amazonS3 = amazonS3;
     }
+
 
     @GetMapping(value = "/listar")
     public ResponseEntity<List<ComplainsDTO>> listarReclamacoes() {
@@ -42,9 +45,10 @@ public class ComplainsController {
         return new ResponseEntity<>(complainsDTO, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/createComplain")
-    public ResponseEntity<ComplainsDTO> createComplain(@RequestBody NovaComplainDTO newComplainDTO) {
-        ComplainsDTO complainsDTO = complainsService.criar(newComplainDTO);
+    @PostMapping(value = "/createComplain", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<ComplainsDTO> createComplain(@RequestPart("evidencia") MultipartFile document, @RequestPart("body") NovaComplainDTO newComplainDTO) throws IOException {
+        ComplainsDTO complainsDTO = complainsService.criar(document, newComplainDTO);
+
         return new ResponseEntity<>(complainsDTO, HttpStatus.CREATED);
     }
 
